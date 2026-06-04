@@ -194,6 +194,7 @@ footer{background:var(--navy);padding:22px 28px;text-align:center;color:var(--te
 footer strong{color:var(--gold-light);}
 
 @media(max-width:600px){
+  .corp-ref-grid{grid-template-columns:1fr!important;}
   .header-inner{padding:22px 16px;flex-direction:column;align-items:flex-start;}
   .container{padding:20px 14px 48px;}
   .card{padding:18px 14px;}
@@ -324,6 +325,82 @@ footer strong{color:var(--gold-light);}
     </div>
     <div id="new-regime-note">
       <div class="hl-note">ℹ️ New Regime: No Chapter VI-A deductions. Only Standard Deduction ₹75,000 (salaried). Zero tax if net income ≤ ₹12,00,000 (Rebate u/s 87A, FY 2025-26).</div>
+    </div>
+  </div>
+
+
+  <!-- ── FIRM / LLP REMUNERATION CARD (Sec 40b) ── -->
+  <div class="card" id="firm-card" style="display:none;">
+    <div class="card-title"><span class="step">2</span> Firm / LLP — Remuneration &amp; Interest to Partners <span style="font-size:12px;font-family:'DM Sans',sans-serif;font-weight:400;color:var(--text-muted);margin-left:6px;">u/s 40(b)</span></div>
+    <p class="card-subtitle">Enter profit before charging remuneration and interest. Allowable limits are auto-calculated as per Section 40(b). All fields are editable.</p>
+
+    <div class="form-grid" style="margin-bottom:20px;">
+      <div class="form-group">
+        <label>Book Profit (Before Rem. &amp; Interest)</label>
+        <div class="input-pfx">
+          <span class="pfx">₹</span>
+          <input type="number" class="form-control" id="firm-bookprofit" placeholder="e.g. 2000000" min="0" step="1000" oninput="calcFirmRem()">
+        </div>
+        <span style="font-size:11.5px;color:var(--text-muted);margin-top:3px;">Net profit per P&amp;L before deducting partners' remuneration &amp; interest</span>
+      </div>
+      <div class="form-group">
+        <label>Interest Paid to Partners (Claimed)</label>
+        <div class="input-pfx">
+          <span class="pfx">₹</span>
+          <input type="number" class="form-control" id="firm-interest" placeholder="0" min="0" step="1000" oninput="calcFirmRem()">
+        </div>
+        <span style="font-size:11.5px;color:var(--text-muted);margin-top:3px;">Max allowable: 12% p.a. simple interest on capital u/s 40(b)(iv)</span>
+      </div>
+    </div>
+
+    <!-- Auto-calculated remuneration box -->
+    <div style="background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border-radius:14px;padding:20px 22px;margin-bottom:18px;">
+      <div style="color:var(--text-light);font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;font-weight:600;margin-bottom:14px;">📐 Maximum Allowable Remuneration u/s 40(b)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+        <div>
+          <div style="color:var(--text-light);font-size:11px;margin-bottom:4px;">Book Profit (after interest)</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--white);" id="firm-bp-display">₹0</div>
+        </div>
+        <div>
+          <div style="color:var(--text-light);font-size:11px;margin-bottom:4px;" id="firm-rem-first-label">Max Remun. (First ₹6L @ 90%)</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold-light);" id="firm-rem-first">₹0</div>
+        </div>
+        <div>
+          <div style="color:var(--text-light);font-size:11px;margin-bottom:4px;">Max Remun. (Balance @ 60%)</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--gold-light);" id="firm-rem-balance">₹0</div>
+        </div>
+        <div>
+          <div style="color:var(--text-light);font-size:11px;margin-bottom:4px;">Total Max Allowable</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold-light);" id="firm-rem-max">₹0</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Actual Remuneration Claimed <span style="color:var(--gold);font-size:10px;">(Editable — auto-filled with max)</span></label>
+        <div class="input-pfx">
+          <span class="pfx">₹</span>
+          <input type="number" class="form-control" id="firm-remuneration" placeholder="0" min="0" step="1000" oninput="this.dataset.userEdited='1';calcFirmNet()">
+        </div>
+        <span style="font-size:11.5px;color:var(--text-muted);margin-top:3px;">Can be ≤ max allowable. Excess over limit will be disallowed u/s 40(b).</span>
+      </div>
+      <div class="form-group">
+        <label>Net Taxable Income of Firm</label>
+        <div class="input-pfx">
+          <span class="pfx">₹</span>
+          <input type="number" class="form-control" id="firm-netincome" placeholder="Auto-calculated" style="background:#f0f4f8;font-weight:700;" readonly>
+        </div>
+        <span style="font-size:11.5px;color:var(--text-muted);margin-top:3px;">= Book Profit − Interest Claimed − Remuneration Claimed</span>
+      </div>
+    </div>
+
+    <div class="hl-note" id="firm-warning" style="display:none;border-left-color:#ef4444;background:rgba(239,68,68,.07);">
+      ⚠️ <strong>Remuneration Exceeds Limit:</strong> Entered remuneration is more than the maximum allowable under Section 40(b). The excess amount will be <strong>disallowed</strong> and added back to taxable income.
+    </div>
+    <div class="hl-note" style="margin-top:12px;">
+      📌 <strong>Note:</strong> Enter the actual remuneration paid/payable to working partners as per Partnership Deed. Only remuneration to <em>working partners</em> is deductible. Sleeping partners' remuneration is not deductible u/s 40(b).
     </div>
   </div>
 
@@ -570,6 +647,79 @@ footer strong{color:var(--gold-light);}
         <div class="ii-text">Surcharge on LTCG u/s 112A is capped at 15%. For LTCG u/s 112 (other assets), marginal surcharge rates apply. VDA / lottery attract full surcharge.</div>
       </div>
     </div>
+
+    <div class="divider"></div>
+    <div class="card-title" style="margin-top:18px;font-size:18px;">🏢 Corporate Tax — Section 115BAA &amp; 115BAB Quick Reference</div>
+    <p class="card-subtitle" style="margin-bottom:16px;">Applicable to domestic companies for AY 2026-27 (FY 2025-26)</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;" class="corp-ref-grid">
+
+      <!-- 115BAA -->
+      <div style="border-radius:14px;border:1.5px solid var(--border);overflow:hidden;">
+        <div style="background:var(--navy);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="color:var(--gold-light);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Section 115BAA</div>
+            <div style="color:var(--white);font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;margin-top:2px;">Domestic Company — Concessional Rate</div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--gold-light);">22%</div>
+        </div>
+        <div style="padding:16px 18px;background:var(--white);">
+          <table style="width:100%;font-size:13px;border-collapse:collapse;">
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Base Tax Rate</td><td style="text-align:right;font-weight:700;">22%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Surcharge</td><td style="text-align:right;font-weight:700;">10% (flat, all income levels)</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Health &amp; Ed. Cess</td><td style="text-align:right;font-weight:700;">4%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Effective Rate (incl. SC &amp; Cess)</td><td style="text-align:right;font-weight:700;color:var(--gold);">25.168%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">MAT (Minimum Alternate Tax)</td><td style="text-align:right;"><span style="background:#d1f2e2;color:#2e7d4f;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">NOT APPLICABLE</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Option Once Exercised</td><td style="text-align:right;font-weight:700;">Permanent (cannot opt out)</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Deductions u/s 10AA, 80IC, 80-IB etc.</td><td style="text-align:right;"><span style="background:#fde8e8;color:#c0392b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">NOT ALLOWED</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Deduction u/s 80M (inter-company div.)</td><td style="text-align:right;font-weight:700;">Allowed</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Additional Depreciation u/s 32(1)(iia)</td><td style="text-align:right;"><span style="background:#fde8e8;color:#c0392b;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">NOT ALLOWED</span></td></tr>
+            <tr><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Applicability</td><td style="text-align:right;font-weight:700;">All domestic companies</td></tr>
+          </table>
+          <div style="margin-top:12px;background:rgba(201,168,76,.08);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--text-dark);line-height:1.6;">
+            💡 <strong>Best suited for:</strong> Companies with large profits and no significant investment-linked deductions. The 25.17% effective rate is lower than the normal 30% rate (effective ~34.94%). Exercise the option by filing Form 10-IC before the due date of ITR.
+          </div>
+        </div>
+      </div>
+
+      <!-- 115BAB -->
+      <div style="border-radius:14px;border:1.5px solid var(--border);overflow:hidden;">
+        <div style="background:linear-gradient(135deg,#1a3a1a,#0d2e0d);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="color:#86efac;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;">Section 115BAB</div>
+            <div style="color:var(--white);font-size:18px;font-family:'Cormorant Garamond',serif;font-weight:700;margin-top:2px;">New Manufacturing Company</div>
+          </div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:#86efac;">15%</div>
+        </div>
+        <div style="padding:16px 18px;background:var(--white);">
+          <table style="width:100%;font-size:13px;border-collapse:collapse;">
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Base Tax Rate</td><td style="text-align:right;font-weight:700;">15%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Surcharge</td><td style="text-align:right;font-weight:700;">10% (flat)</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Health &amp; Ed. Cess</td><td style="text-align:right;font-weight:700;">4%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Effective Rate</td><td style="text-align:right;font-weight:700;color:#16a34a;">17.01%</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">MAT</td><td style="text-align:right;"><span style="background:#d1f2e2;color:#2e7d4f;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">NOT APPLICABLE</span></td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Incorporated &amp; Commenced Mfg.</td><td style="text-align:right;font-weight:700;">After 1 Oct 2019, before 31 Mar 2024</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Production Start Deadline</td><td style="text-align:right;font-weight:700;">On or before 31 March 2024 (as amended)</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Business must be</td><td style="text-align:right;font-weight:700;">Manufacture or production of articles</td></tr>
+            <tr style="border-bottom:1px solid var(--border);"><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Income from royalty / fees for tech.</td><td style="text-align:right;"><span style="background:#fef3e2;color:#b45309;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;">@ 22% NOT 15%</span></td></tr>
+            <tr><td style="padding:7px 0;color:var(--text-muted);font-weight:600;">Form required</td><td style="text-align:right;font-weight:700;">Form 10-ID (before ITR due date)</td></tr>
+          </table>
+          <div style="margin-top:12px;background:rgba(22,163,74,.07);border-left:3px solid #16a34a;border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--text-dark);line-height:1.6;">
+            💡 <strong>Best suited for:</strong> New manufacturing ventures in India. Extremely favourable at 17.01% effective rate. Cannot carry forward losses / unabsorbed depreciation from earlier (pre-option) years. Cannot split manufacturing and service income to misclassify.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Comparison bar -->
+    <div style="background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border-radius:12px;padding:18px 22px;margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;text-align:center;">
+      <div><div style="color:var(--text-light);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Normal Co. (≤400Cr)</div><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--white);">34.94%</div><div style="color:var(--text-light);font-size:11px;">Effective Rate</div></div>
+      <div><div style="color:var(--text-light);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Sec 115BAA</div><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--gold-light);">25.17%</div><div style="color:var(--text-light);font-size:11px;">Effective Rate</div></div>
+      <div><div style="color:var(--text-light);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Sec 115BAB</div><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#86efac;">17.01%</div><div style="color:var(--text-light);font-size:11px;">Effective Rate</div></div>
+      <div><div style="color:var(--text-light);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">Firm / LLP</div><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:var(--white);">34.944%</div><div style="color:var(--text-light);font-size:11px;">Eff. Rate (>1Cr)</div></div>
+      <div><div style="color:var(--text-light);font-size:11px;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;">New Mfg. Saving vs Normal</div><div style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#86efac;">17.93%</div><div style="color:var(--text-light);font-size:11px;">% Lower than Normal</div></div>
+    </div>
+
   </div>
 
 </div>
@@ -921,17 +1071,116 @@ function computeIndividual(grossIncome, regime, statusKey, employer, ay) {
 // ════════════════════════════════════════════════
 //  CORPORATE COMPUTATION
 // ════════════════════════════════════════════════
-function computeCorporate(grossIncome, statusKey) {
+function computeCorporate(grossIncome, statusKey, ay) {
   const d = CORP_RATES[statusKey];
-  const baseTax = grossIncome * d.rate / 100;
+
+  // For firm: use net income calculated from remuneration card
+  let netNormalIncome = grossIncome;
+  let bookProfit = 0, interestClaimed = 0, remClaimed = 0, remMax = 0, remExcess = 0;
+  if (statusKey === 'firm') {
+    bookProfit    = parseFloat(document.getElementById('firm-bookprofit').value) || 0;
+    interestClaimed = parseFloat(document.getElementById('firm-interest').value) || 0;
+    remClaimed    = parseFloat(document.getElementById('firm-remuneration').value) || 0;
+    remMax        = calcMaxRemuneration(bookProfit - interestClaimed, ay);
+    remExcess     = Math.max(0, remClaimed - remMax); // disallowed amount
+    const allowedRem = Math.min(remClaimed, remMax);
+    // If firm-bookprofit is filled, use it; otherwise fall back to grossIncome
+    if (bookProfit > 0) {
+      netNormalIncome = Math.max(0, bookProfit - interestClaimed - allowedRem);
+    }
+  }
+
+  const baseTax = netNormalIncome * d.rate / 100;
   let surcharge = 0, surchargeRate = 0;
   for (const s of d.sc) {
-    if (grossIncome > s.from && (s.to === Infinity || grossIncome <= s.to)) { surchargeRate = s.rate; surcharge = baseTax * s.rate / 100; break; }
+    if (netNormalIncome > s.from && (s.to === Infinity || netNormalIncome <= s.to)) { surchargeRate = s.rate; surcharge = baseTax * s.rate / 100; break; }
   }
   const cess = (baseTax + surcharge) * 0.04;
-  const totalTax = baseTax + surcharge + cess;
-  const effRate = grossIncome > 0 ? totalTax / grossIncome * 100 : 0;
-  return { grossIncome, baseTax, surcharge, surchargeRate, cess, totalTax, effRate, rate: d.rate };
+  const slabTotalTax = baseTax + surcharge + cess;
+
+  // Special rate income for firms/companies (NO shortfall benefit)
+  const srData = calcSpecialTax(ay, d.sc, netNormalIncome, 'corp', statusKey);
+  const srResults = srData.results;
+  const specialTotalTax = srResults.reduce((s, r) => s + r.total, 0);
+  const specialTotalIncome = srResults.reduce((s, r) => s + r.amount, 0);
+
+  const grandTotal = slabTotalTax + specialTotalTax;
+  const totalIncome = netNormalIncome + specialTotalIncome;
+  const effRate = totalIncome > 0 ? grandTotal / totalIncome * 100 : 0;
+
+  return {
+    grossIncome, netNormalIncome, bookProfit, interestClaimed, remClaimed, remMax, remExcess,
+    baseTax, surcharge, surchargeRate, cess, slabTotalTax,
+    srResults, specialTotalTax, specialTotalIncome,
+    grandTotal, totalIncome, effRate, rate: d.rate, statusKey
+  };
+}
+
+// ── Sec 40(b): Calculate max allowable remuneration ──
+// Sec 40(b) remuneration limits — AY-aware
+// Finance Act 2024: new limits effective from FY 2025-26 (AY 2026-27)
+//   First ₹6,00,000 → Higher of ₹3,00,000 or 90% of book profit
+//   Balance          → 60%
+// Prior years (AY 2025-26 and 2024-25):
+//   First ₹3,00,000 → Higher of ₹1,50,000 or 90% of book profit
+//   Balance          → 60%
+function calcMaxRemuneration(bookProfitAfterInterest, ay) {
+  const bp = bookProfitAfterInterest;
+  const isNew = (ay === '2026-27'); // Finance Act 2024 applies from AY 2026-27
+  const firstSlabLimit = isNew ? 600000 : 300000;   // ₹6L or ₹3L
+  const minFloor       = isNew ? 300000 : 150000;   // ₹3L or ₹1.5L floor
+  if (bp <= 0) return minFloor;                      // loss: return floor
+  const firstSlab = Math.min(bp, firstSlabLimit);
+  const balance   = Math.max(0, bp - firstSlabLimit);
+  const remFirst  = Math.max(minFloor, firstSlab * 0.90);
+  const remBal    = balance * 0.60;
+  return remFirst + remBal;
+}
+
+// ── Live calculation for firm remuneration card ──
+function calcFirmRem() {
+  const ay      = document.getElementById('ay').value;
+  const bp      = parseFloat(document.getElementById('firm-bookprofit').value) || 0;
+  const int_    = parseFloat(document.getElementById('firm-interest').value) || 0;
+  const bpAfterInt    = bp - int_;
+  const isNewFormula  = (ay === '2026-27'); // Finance Act 2024 rates
+  const firstSlabLim  = isNewFormula ? 600000 : 300000;
+  const minFloor      = isNewFormula ? 300000 : 150000;
+  const firstSlabLbl  = isNewFormula ? '₹6L'  : '₹3L';
+  const maxRem        = calcMaxRemuneration(bpAfterInt, ay);
+  const firstSlab     = Math.min(Math.max(0, bpAfterInt), firstSlabLim);
+  const remFirst      = bpAfterInt <= 0 ? minFloor : Math.max(minFloor, firstSlab * 0.90);
+  const remBalance    = bpAfterInt > firstSlabLim ? (bpAfterInt - firstSlabLim) * 0.60 : 0;
+
+  document.getElementById('firm-bp-display').textContent  = fmt(bpAfterInt);
+  document.getElementById('firm-rem-first').textContent   = fmt(remFirst);
+  document.getElementById('firm-rem-balance').textContent = fmt(remBalance);
+  document.getElementById('firm-rem-max').textContent     = fmt(maxRem);
+
+  // Update dynamic label next to the first-slab box
+  const lbl = document.getElementById('firm-rem-first-label');
+  if (lbl) lbl.textContent = 'Max Remun. (First ' + firstSlabLbl + ' @ 90%)';
+
+
+
+  // Auto-fill remuneration with max (only if user has not manually edited it)
+  const remInput = document.getElementById('firm-remuneration');
+  if (!remInput.dataset.userEdited) remInput.value = Math.round(maxRem);
+  calcFirmNet();
+}
+
+function calcFirmNet() {
+  const ay    = document.getElementById('ay').value;
+  const bp    = parseFloat(document.getElementById('firm-bookprofit').value) || 0;
+  const int_  = parseFloat(document.getElementById('firm-interest').value) || 0;
+  const rem   = parseFloat(document.getElementById('firm-remuneration').value) || 0;
+  const bpAfterInt = bp - int_;
+  const maxRem = calcMaxRemuneration(bpAfterInt, ay);
+  const allowed = Math.min(rem, maxRem);
+  const net = Math.max(0, bp - int_ - allowed);
+  document.getElementById('firm-netincome').value = Math.round(net);
+  const warn = document.getElementById('firm-warning');
+  warn.style.display = rem > maxRem ? 'block' : 'none';
 }
 
 // ════════════════════════════════════════════════
@@ -945,12 +1194,42 @@ function renderBreakdown(r, isCorp) {
   };
 
   if (isCorp) {
-    row('Gross Total Income', fmt(r.grossIncome));
-    row('Income Tax @ ' + r.rate + '%', fmt(r.baseTax));
-    if (r.surcharge) row('Surcharge @ ' + r.surchargeRate + '%', fmt(r.surcharge));
-    row('Health &amp; Education Cess @ 4%', fmt(r.cess));
-    row('Total Tax Payable', fmt(r.totalTax), 'total');
-    row('Effective Tax Rate', fmtPct(r.effRate), 'highlight');
+    // Firm: show remuneration working
+    if (r.statusKey === 'firm' && r.bookProfit > 0) {
+      row('A. NORMAL BUSINESS INCOME', '', 'section-head');
+      row('Book Profit (before Rem. & Interest)', fmt(r.bookProfit), 'sub');
+      row('Less: Interest to Partners (u/s 40(b))', '(' + fmt(r.interestClaimed) + ')', 'sub', 'Max 12% p.a. simple interest');
+      row('Book Profit (after Interest)', fmt(r.bookProfit - r.interestClaimed), 'sub highlight');
+      row('Max Allowable Remuneration u/s 40(b)', fmt(r.remMax), 'sub', ay === '2026-27' ? 'FA 2024: Higher of ₹3L or 90% on first ₹6L + 60% balance' : 'Pre-FA 2024: Higher of ₹1.5L or 90% on first ₹3L + 60% balance');
+      row('Remuneration Claimed', '(' + fmt(Math.min(r.remClaimed, r.remMax)) + ')', 'sub');
+      if (r.remExcess > 0) row('⚠️ Disallowed Remuneration (excess over 40(b) limit)', fmt(r.remExcess), 'sub', 'Added back to taxable income');
+      row('Net Taxable Income (Normal)', fmt(r.netNormalIncome), 'sub highlight');
+    } else {
+      row('A. NORMAL INCOME', '', 'section-head');
+      row('Total Income (Normal)', fmt(r.netNormalIncome), 'sub');
+    }
+    row('Income Tax @ ' + r.rate + '%', fmt(r.baseTax), 'sub');
+    if (r.surcharge) row('Surcharge @ ' + r.surchargeRate + '%', fmt(r.surcharge), 'sub');
+    row('Health & Education Cess @ 4%', fmt(r.cess), 'sub');
+    row('Sub-total: Tax on Normal Income', fmt(r.slabTotalTax), 'highlight');
+
+    // Special rate income
+    if (r.srResults && r.srResults.length > 0) {
+      row('B. SPECIAL RATE INCOME', '', 'section-head');
+      for (const sr of r.srResults) {
+        row(sr.label, fmt(sr.amount), 'sub', 'Rate: ' + sr.rate + '%', '<span class="tag tag-' + sr.tag + '">' + sr.rate + '%</span>');
+        if (sr.exempt > 0) row('  Less: Sec 112A Exemption', '(' + fmt(sr.exempt) + ')', 'sub tm');
+        row('  Taxable Amount', fmt(sr.taxable !== undefined ? sr.taxable : sr.amount), 'sub');
+        row('  Base Tax @ ' + sr.rate + '%', fmt(sr.baseTax), 'sub');
+        if (sr.surcharge > 0) row('  Surcharge', fmt(sr.surcharge), 'sub tm');
+        row('  Cess @ 4%', fmt(sr.cess), 'sub tm');
+        row('  Net Tax', fmt(sr.total), 'sub highlight');
+      }
+      row('Sub-total: Tax on Special Rate Income', fmt(r.specialTotalTax), 'highlight');
+    }
+
+    row('TOTAL TAX PAYABLE', fmt(r.grandTotal), 'total');
+    row('Effective Tax Rate on Total Income', fmtPct(r.effRate), 'highlight', 'On Normal + Special Income');
     return;
   }
 
@@ -1035,7 +1314,8 @@ function renderBreakdown(r, isCorp) {
 // ════════════════════════════════════════════════
 function renderCGDetail(r, ay) {
   const el = document.getElementById('cg-detail-body');
-  if (r.srResults.length === 0) {
+  const srList = r.srResults || [];
+  if (srList.length === 0) {
     el.innerHTML = '<div class="hl-note">No special rate income entered. Fill Step 3 to see Capital Gains / Crypto / Lottery details here.</div>';
     return;
   }
@@ -1050,7 +1330,7 @@ function renderCGDetail(r, ay) {
 
   html += '<table class="bk-table"><thead><tr><th>Type of Income</th><th class="tr">Amount</th><th class="tr">112A Exempt</th><th class="tr">BEL Adj.</th><th class="tr">Taxable</th><th class="tr">Rate</th><th class="tr">Base Tax</th><th class="tr">SC+Cess</th><th class="tr">Total Tax</th></tr></thead><tbody>';
   let totalGross = 0, totalTax = 0;
-  for (const sr of r.srResults) {
+  for (const sr of srList) {
     const taxable = sr.taxable !== undefined ? sr.taxable : sr.amount;
     totalGross += sr.amount;
     totalTax += sr.total;
@@ -1228,20 +1508,20 @@ function calculate() {
   showTab('tab-breakdown');
 
   if (isCorp) {
-    const r = computeCorporate(grossIncome, statusKey);
+    const r = computeCorporate(grossIncome, statusKey, ay);
     document.getElementById('single-result').style.display = 'block';
     document.getElementById('compare-result').style.display = 'none';
-    document.getElementById('r-income').textContent = fmt(grossIncome);
-    document.getElementById('r-taxable').textContent = fmt(grossIncome);
-    document.getElementById('r-special').textContent = '—';
-    document.getElementById('r-regime-label').textContent = {firm:'Firm/LLP 30%', company_domestic:'Sec 115BAA 22%', company_normal:'Normal 25%', company_new:'Sec 115BAB 15%'}[statusKey];
-    document.getElementById('r-total-tax').textContent = fmt(r.totalTax);
+    document.getElementById('r-income').textContent = fmt(r.totalIncome);
+    document.getElementById('r-taxable').textContent = fmt(r.netNormalIncome);
+    document.getElementById('r-special').textContent = r.specialTotalIncome > 0 ? fmt(r.specialTotalIncome) : '₹0 (None entered)';
+    document.getElementById('r-regime-label').textContent = {firm:'Firm/LLP @ 30%', company_domestic:'Sec 115BAA @ 22%', company_normal:'Normal Rate @ 25%', company_new:'Sec 115BAB @ 15%'}[statusKey];
+    document.getElementById('r-total-tax').textContent = fmt(r.grandTotal);
     document.getElementById('r-eff-rate').textContent = fmtPct(r.effRate);
     renderBreakdown(r, true);
-    renderAdvance(r.totalTax, ay);
+    renderCGDetail(r, ay);
+    renderAdvance(r.grandTotal, ay);
     document.getElementById('slab-body').innerHTML = `<tr><td>Flat Rate @ ${r.rate}%</td><td class="tr">${r.rate}%</td><td class="tr">${fmt(r.baseTax)}</td></tr>`;
-    document.getElementById('cg-detail-body').innerHTML = '<div class="hl-note">Capital Gains detail is available for Individuals / HUF only.</div>';
-    document.getElementById('tips-grid').innerHTML = `<div class="info-item"><div class="ii-icon">📋</div><div class="ii-title">Presumptive Tax</div><div class="ii-text">If turnover &lt; ₹3 Cr (&lt;5% cash), consider Sec 44AD — pay tax on 6-8% of turnover.</div></div><div class="info-item"><div class="ii-icon">🏢</div><div class="ii-title">Sec 115BAA</div><div class="ii-text">22% flat rate (eff. ~25.17% with surcharge &amp; cess) permanently. No MAT. No deductions.</div></div>`;
+    document.getElementById('tips-grid').innerHTML = `<div class="info-item"><div class="ii-icon">📋</div><div class="ii-title">Presumptive Tax</div><div class="ii-text">If turnover &lt; ₹3 Cr (&lt;5% cash), consider Sec 44AD — pay tax on 6-8% of turnover.</div></div><div class="info-item"><div class="ii-icon">🏢</div><div class="ii-title">Sec 115BAA</div><div class="ii-text">22% flat rate (eff. ~25.17% with surcharge &amp; cess) permanently. No MAT. No deductions.</div></div><div class="info-item"><div class="ii-icon">📈</div><div class="ii-title">Capital Gains</div><div class="ii-text">Firms and companies pay tax on STCG / LTCG at same special rates. LTCG 112A exemption of ₹1.25L also applicable. No basic exemption shortfall benefit.</div></div>`;
     return;
   }
 
@@ -1287,13 +1567,27 @@ function onStatusChange() {
   const s = document.getElementById('status').value;
   const isCorp = ['firm','company_domestic','company_normal','company_new'].includes(s);
   document.getElementById('deductions-card').style.display = isCorp ? 'none' : 'block';
-  document.getElementById('special-card').style.display = isCorp ? 'none' : 'block';
+  document.getElementById('special-card').style.display = 'block'; // shown for ALL
+  document.getElementById('firm-card').style.display = (s === 'firm') ? 'block' : 'none';
   document.getElementById('employer-group').style.display = (isCorp || s === 'huf') ? 'none' : 'block';
+  // Relabel normal income field for firms
+  const incomeLabel = document.querySelector('#income-group label');
+  if (incomeLabel) {
+    if (s === 'firm') incomeLabel.textContent = 'Normal Business Income (excl. CG / Special)';
+    else if (isCorp) incomeLabel.textContent = 'Total Income (excl. Special Rate Income)';
+    else incomeLabel.textContent = 'Normal Income (Salary / Business / Other)';
+  }
 }
 
 function onAYChange() {
   const ay = document.getElementById('ay').value;
   const sr = SR_RATES[ay];
+  // Refresh firm remuneration if firm is selected
+  if (document.getElementById('status').value === 'firm') {
+    const lbl = document.getElementById('firm-rem-first-label');
+    if (lbl) lbl.textContent = ay === '2026-27' ? 'Max Remun. (First ₹6L @ 90%)' : 'Max Remun. (First ₹3L @ 90%)';
+    calcFirmRem();
+  }
   // Update pills
   document.getElementById('pill-111a').textContent = sr.stcg111a.label;
   document.getElementById('pill-112a').textContent = sr.ltcg112a.label;
