@@ -2201,5 +2201,506 @@ function enablePDFBtn() {
 onStatusChange();
 onAYChange();
 </script>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     EMAIL GATE — STYLES
+     ════════════════════════════════════════════════════════════ -->
+<style>
+/* ── Blur the entire page content behind the gate ── */
+body.gate-active > *:not(#kc-gate-overlay) {
+  filter: blur(4px);
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── Full-screen overlay ── */
+#kc-gate-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(13, 27, 42, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: gateIn .35s ease;
+}
+@keyframes gateIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Gate card ── */
+#kc-gate-card {
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 24px 80px rgba(13,27,42,.45), 0 0 0 1px rgba(201,168,76,.2);
+  width: 100%;
+  max-width: 460px;
+  overflow: hidden;
+  animation: cardUp .4s cubic-bezier(.22,.68,0,1.2);
+}
+@keyframes cardUp {
+  from { opacity:0; transform: translateY(30px) scale(.97); }
+  to   { opacity:1; transform: translateY(0)   scale(1);   }
+}
+
+/* ── Card header ── */
+#kc-gate-header {
+  background: linear-gradient(135deg, #0d1b2a 0%, #1e3050 100%);
+  padding: 28px 30px 22px;
+  position: relative;
+  overflow: hidden;
+}
+#kc-gate-header::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #c9a84c, #e8c97a, #c9a84c, transparent);
+}
+#kc-gate-header::before {
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(201,168,76,.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+.kc-gate-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+.kc-gate-logo-icon {
+  width: 44px; height: 44px;
+  background: linear-gradient(135deg, #c9a84c, #e8c97a);
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(201,168,76,.3);
+}
+.kc-gate-logo-text h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 700;
+  color: #ffffff; line-height: 1.2;
+}
+.kc-gate-logo-text p {
+  font-size: 11px; color: #8fa3ba;
+  margin-top: 2px; letter-spacing: .3px;
+}
+.kc-gate-tagline {
+  position: relative;
+  font-size: 13px; color: #c9d8e8; line-height: 1.55;
+}
+.kc-gate-tagline strong { color: #e8c97a; }
+
+/* ── Card body ── */
+#kc-gate-body {
+  padding: 26px 30px 28px;
+}
+.kc-gate-access-label {
+  font-size: 12px; font-weight: 700;
+  color: #5a6e85; letter-spacing: .6px;
+  text-transform: uppercase; margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+.kc-gate-access-label::before,
+.kc-gate-access-label::after {
+  content: ''; flex: 1;
+  height: 1px; background: #e2d9c8;
+}
+
+/* ── Form fields ── */
+.kc-gate-field { margin-bottom: 14px; }
+.kc-gate-field label {
+  display: block;
+  font-size: 11.5px; font-weight: 700;
+  color: #5a6e85; letter-spacing: .5px;
+  text-transform: uppercase; margin-bottom: 6px;
+}
+.kc-gate-field input {
+  width: 100%;
+  border: 1.5px solid #e2d9c8;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14.5px;
+  font-family: 'DM Sans', sans-serif;
+  color: #0d1b2a;
+  background: #faf6ee;
+  outline: none;
+  transition: all .2s;
+  box-sizing: border-box;
+}
+.kc-gate-field input:focus {
+  border-color: #c9a84c;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(201,168,76,.12);
+}
+.kc-gate-field input.kc-error {
+  border-color: #ef4444;
+  background: #fff8f8;
+  box-shadow: 0 0 0 3px rgba(239,68,68,.1);
+}
+.kc-field-err {
+  font-size: 11.5px; color: #dc2626;
+  margin-top: 4px; display: none;
+}
+
+/* ── Submit button ── */
+#kc-gate-submit {
+  width: 100%;
+  background: linear-gradient(135deg, #0d1b2a, #1e3050);
+  color: #e8c97a;
+  border: none;
+  border-radius: 11px;
+  padding: 13px 20px;
+  font-size: 15px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  margin-top: 6px;
+  transition: all .25s;
+  display: flex; align-items: center;
+  justify-content: center; gap: 9px;
+  letter-spacing: .3px;
+  box-shadow: 0 4px 16px rgba(13,27,42,.22);
+}
+#kc-gate-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(13,27,42,.32);
+}
+#kc-gate-submit:disabled {
+  opacity: .65; cursor: not-allowed; transform: none;
+}
+#kc-gate-submit .kc-btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(232,201,122,.3);
+  border-top-color: #e8c97a;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Success state ── */
+#kc-gate-success {
+  display: none;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+.kc-success-icon {
+  width: 58px; height: 58px;
+  background: linear-gradient(135deg, #059669, #10b981);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin: 0 auto 14px;
+  box-shadow: 0 6px 20px rgba(5,150,105,.25);
+  animation: popIn .4s cubic-bezier(.22,.68,0,1.4);
+}
+@keyframes popIn {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.kc-success-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px; font-weight: 700;
+  color: #0d1b2a; margin-bottom: 6px;
+}
+.kc-success-sub {
+  font-size: 13px; color: #5a6e85; line-height: 1.55;
+  margin-bottom: 18px;
+}
+#kc-gate-open-btn {
+  background: linear-gradient(135deg, #059669, #10b981);
+  color: #ffffff;
+  border: none; border-radius: 11px;
+  padding: 13px 28px;
+  font-size: 15px; font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer; letter-spacing: .3px;
+  box-shadow: 0 4px 16px rgba(5,150,105,.3);
+  transition: all .25s;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+#kc-gate-open-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(5,150,105,.38);
+}
+
+/* ── Privacy note ── */
+.kc-privacy {
+  font-size: 11px; color: #8fa3ba;
+  text-align: center; margin-top: 14px;
+  line-height: 1.5;
+}
+.kc-privacy a { color: #c9a84c; text-decoration: none; }
+
+/* ── Chips ── */
+.kc-gate-chips {
+  display: flex; flex-wrap: wrap;
+  gap: 6px; margin-top: 10px;
+}
+.kc-chip {
+  background: rgba(201,168,76,.12);
+  border: 1px solid rgba(201,168,76,.28);
+  color: #e8c97a;
+  font-size: 10.5px; font-weight: 600;
+  padding: 3px 9px; border-radius: 20px;
+}
+
+/* ── Mobile ── */
+@media (max-width: 500px) {
+  #kc-gate-header { padding: 22px 20px 18px; }
+  #kc-gate-body   { padding: 20px 20px 22px; }
+  #kc-gate-card   { border-radius: 16px; }
+}
+</style>
+
+
+<!-- ════════════════════════════════════════════════════════════
+     EMAIL GATE — HTML
+     ════════════════════════════════════════════════════════════ -->
+<div id="kc-gate-overlay" role="dialog" aria-modal="true" aria-labelledby="kc-gate-title">
+
+  <div id="kc-gate-card">
+
+    <!-- Header -->
+    <div id="kc-gate-header">
+      <div class="kc-gate-logo">
+        <div class="kc-gate-logo-icon">⚖️</div>
+        <div class="kc-gate-logo-text">
+          <h2>Key Consultancy</h2>
+          <p>Tax Planning · Bhavnagar, Gujarat</p>
+        </div>
+      </div>
+      <div class="kc-gate-tagline">
+        Get <strong>free access</strong> to India's most detailed tax planner —
+        covering <strong>FY 2023-24 to Tax Year 2026-27</strong>, Capital Gains,
+        Crypto, Advance Tax &amp; more.
+        <div class="kc-gate-chips">
+          <span class="kc-chip">📅 Tax Year 2026-27</span>
+          <span class="kc-chip">IT Act 2025</span>
+          <span class="kc-chip">CG · VDA · Lottery</span>
+          <span class="kc-chip">PDF Download</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div id="kc-gate-body">
+
+      <div class="kc-gate-access-label">Free Access</div>
+
+      <!-- Form (visible initially) -->
+      <div id="kc-gate-form-area">
+        <div class="kc-gate-field">
+          <label for="kc-name">Your Name</label>
+          <input type="text" id="kc-name" placeholder="e.g. Rajesh Mehta"
+                 autocomplete="name" spellcheck="false">
+          <div class="kc-field-err" id="kc-name-err">Please enter your name.</div>
+        </div>
+
+        <div class="kc-gate-field">
+          <label for="kc-email">Email Address</label>
+          <input type="email" id="kc-email" placeholder="e.g. rajesh@example.com"
+                 autocomplete="email" spellcheck="false">
+          <div class="kc-field-err" id="kc-email-err">Please enter a valid email address.</div>
+        </div>
+
+        <button id="kc-gate-submit" onclick="kcGateSubmit()">
+          <div class="kc-btn-spinner" id="kc-spinner"></div>
+          <span id="kc-btn-text">🔓 Access Free Tax Calculator</span>
+        </button>
+
+        <div class="kc-privacy">
+          🔒 Your information is safe. We only use it to send you
+          tax updates &amp; resources — no spam, ever.
+          By continuing you agree to our privacy policy.
+        </div>
+      </div>
+
+      <!-- Success state (hidden initially) -->
+      <div id="kc-gate-success">
+        <div class="kc-success-icon">✓</div>
+        <div class="kc-success-title" id="kc-gate-title">Welcome aboard!</div>
+        <div class="kc-success-sub" id="kc-success-msg">
+          Thank you! Opening your tax calculator now…
+        </div>
+        <button id="kc-gate-open-btn" onclick="kcOpenCalculator()">
+          🧮 Open Tax Calculator →
+        </button>
+      </div>
+
+    </div><!-- /gate-body -->
+  </div><!-- /gate-card -->
+</div><!-- /gate-overlay -->
+
+
+<!-- ════════════════════════════════════════════════════════════
+     EMAIL GATE — JAVASCRIPT
+     Uses Google Apps Script Web App as backend.
+     No Google Form entry IDs needed. Just one URL to paste.
+     ════════════════════════════════════════════════════════════ -->
+<script>
+// ════════════════════════════════════════════════════════════
+//  ▼▼▼  ONLY ONE THING TO PASTE — YOUR WEB APP URL  ▼▼▼
+//
+//  After deploying the Apps Script (see KeyConsultancy_GateScript.gs),
+//  paste your Web App URL below. It looks like:
+//  https://script.google.com/macros/s/AKfycb.../exec
+//
+// ════════════════════════════════════════════════════════════
+const KC_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyP-t2nd6Y5hmmibzAowosASGZV50YMBHcroFfxZ761KEFUg6Rb0WJTn1QXczqsOpqNKQ/exec';
+// ════════════════════════════════════════════════════════════
+//  ▲▲▲  THAT'S IT. DO NOT EDIT ANYTHING BELOW THIS LINE  ▲▲▲
+// ════════════════════════════════════════════════════════════
+
+const KC_SESSION_KEY    = 'kc_tax_gate_v1';   // change to force re-gate all users
+const KC_AUTO_OPEN_MS   = 2200;               // ms after success before auto-open
+
+// ── On script load: check session, set up listeners ──
+(function () {
+  if (sessionStorage.getItem(KC_SESSION_KEY) === 'passed') {
+    kcOpenCalculator();   // already registered this session — skip gate
+    return;
+  }
+  document.body.classList.add('gate-active');   // blur page behind gate
+
+  window.addEventListener('load', function () {
+    const n = document.getElementById('kc-name');
+    if (n) setTimeout(function(){ n.focus(); }, 420);
+  });
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    const ov = document.getElementById('kc-gate-overlay');
+    if (ov && ov.style.display !== 'none') kcGateSubmit();
+  });
+})();
+
+// ── Email format validation ──
+function kcValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+}
+
+// ── Show / hide field error ──
+function kcSetError(inputId, errId, show) {
+  var inp = document.getElementById(inputId);
+  var err = document.getElementById(errId);
+  if (!inp || !err) return;
+  inp.classList[show ? 'add' : 'remove']('kc-error');
+  err.style.display = show ? 'block' : 'none';
+}
+
+// ── Switch gate card to success view ──
+function kcShowSuccess(firstName) {
+  var title = document.getElementById('kc-gate-title');
+  var msg   = document.getElementById('kc-success-msg');
+  var form  = document.getElementById('kc-gate-form-area');
+  var succ  = document.getElementById('kc-gate-success');
+  if (title) title.textContent = 'Welcome, ' + firstName + '! \uD83C\uDF89';
+  if (msg)   msg.innerHTML =
+    'Access confirmed. The full tax calculator \u2014 covering ' +
+    '<strong>Tax Year 2026\u201127</strong> under the ' +
+    'Income Tax Act 2025 \u2014 is ready for you.';
+  if (form)  form.style.display = 'none';
+  if (succ)  succ.style.display = 'block';
+  sessionStorage.setItem(KC_SESSION_KEY, 'passed');
+  setTimeout(kcOpenCalculator, KC_AUTO_OPEN_MS);
+}
+
+// ── Reset button to normal state ──
+function kcResetBtn() {
+  var btn     = document.getElementById('kc-gate-submit');
+  var spinner = document.getElementById('kc-spinner');
+  var txt     = document.getElementById('kc-btn-text');
+  if (btn)     btn.disabled         = false;
+  if (spinner) spinner.style.display = 'none';
+  if (txt)     txt.textContent       = '\uD83D\uDD13 Access Free Tax Calculator';
+}
+
+// ── Main submit handler ──
+function kcGateSubmit() {
+  var nameVal  = (document.getElementById('kc-name')  ? document.getElementById('kc-name').value  : '').trim();
+  var emailVal = (document.getElementById('kc-email') ? document.getElementById('kc-email').value : '').trim();
+
+  // ── Validate ──
+  var hasErr = false;
+  if (!nameVal)              { kcSetError('kc-name',  'kc-name-err',  true);  hasErr = true; }
+  else                       { kcSetError('kc-name',  'kc-name-err',  false); }
+  if (!kcValidEmail(emailVal)){ kcSetError('kc-email', 'kc-email-err', true);  hasErr = true; }
+  else                        { kcSetError('kc-email', 'kc-email-err', false); }
+  if (hasErr) return;
+
+  // ── Show loading state ──
+  var btn     = document.getElementById('kc-gate-submit');
+  var spinner = document.getElementById('kc-spinner');
+  var txt     = document.getElementById('kc-btn-text');
+  if (btn)     btn.disabled         = true;
+  if (spinner) spinner.style.display = 'block';
+  if (txt)     txt.textContent       = 'Saving…';
+
+  var firstName = nameVal.split(' ')[0];
+
+  // ── Check if Web App URL has been configured ──
+  if (!KC_WEBAPP_URL || KC_WEBAPP_URL === 'YOUR_APPS_SCRIPT_WEB_APP_URL_HERE') {
+    // Dev/test mode: no URL configured yet — still let user through
+    console.warn('KC Gate: Web App URL not configured. Letting user through in test mode.');
+    kcShowSuccess(firstName);
+    return;
+  }
+
+  // ── Build request URL (GET with query params — no CORS preflight) ──
+  // Apps Script Web Apps deployed as "Anyone" accept GET requests without CORS issues.
+  var url = KC_WEBAPP_URL
+    + '?name='      + encodeURIComponent(nameVal)
+    + '&email='     + encodeURIComponent(emailVal)
+    + '&page='      + encodeURIComponent(window.location.href)
+    + '&ts='        + encodeURIComponent(new Date().toISOString())
+    + '&ua='        + encodeURIComponent(navigator.userAgent.substring(0, 120));
+
+  // ── Use no-cors fetch — we don't need the response body, just fire & forget ──
+  // The Apps Script writes to the Sheet regardless. We optimistically show success.
+  fetch(url, { method: 'GET', mode: 'no-cors' })
+    .then(function () {
+      kcShowSuccess(firstName);
+    })
+    .catch(function (err) {
+      // Network error — still let user through (don't penalise for infra issues)
+      console.warn('KC Gate: fetch error (letting user through):', err);
+      kcShowSuccess(firstName);
+    });
+
+  // ── Fallback: if fetch takes >6s, open calculator anyway ──
+  setTimeout(function () {
+    if (sessionStorage.getItem(KC_SESSION_KEY) !== 'passed') {
+      console.warn('KC Gate: fetch timeout — opening calculator anyway.');
+      kcShowSuccess(firstName);
+    }
+  }, 6000);
+}
+
+// ── Smoothly close gate overlay and reveal calculator ──
+function kcOpenCalculator() {
+  var overlay = document.getElementById('kc-gate-overlay');
+  if (!overlay) { document.body.classList.remove('gate-active'); return; }
+  overlay.style.transition = 'opacity .35s ease';
+  overlay.style.opacity    = '0';
+  setTimeout(function () {
+    overlay.style.display = 'none';
+    document.body.classList.remove('gate-active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 360);
+}
+</script>
+
 </body>
 </html>
